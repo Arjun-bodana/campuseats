@@ -1,54 +1,53 @@
-# CampusEats - System Architecture & Domain Brief
+# CampusEats — System Brief
 
-## 1. What CampusEats Does (System Overview)
-CampusEats is an on-campus digital food ordering and pickup management platform tailored for university environments. The system eliminates long physical queues at campus food courts, cafeterias, and canteens during rush hours. 
+## 1. What CampusEats Does
+CampusEats is an online food ordering and pickup management web application built for our college campus. 
 
-Students and faculty can browse live digitized menus, check real-time item availability, customize dishes, place pre-orders, and make cashless payments. For canteen vendors, the platform provides an order management dashboard to streamline kitchen workflows, control live inventory, manage preparation queues, and notify customers when their food is ready for pickup.
+During lunch and tea breaks, students and faculty face long queues at campus canteens and food stalls, which wastes a lot of break time. CampusEats solves this problem by allowing students to view live canteen menus, check item availability, place orders in advance, and pay online. 
 
----
-
-## 2. Who Uses It (Actors / Stakeholders)
-
-- **Students & Faculty (Customers / End-Users):**
-  - Search campus food outlets, view item pricing and nutritional/dietary tags.
-  - Place scheduled or instant pickup orders and track live order progress.
-  - Execute digital payments and submit feedback/reviews.
-
-- **Canteen Staff / Vendors (Merchants):**
-  - Manage daily menu items (pricing, active/inactive status, stock).
-  - Accept, queue, and transition order states (e.g., *Received* -> *Preparing* -> *Ready for Pickup*).
-  - Review daily sales summaries and order throughput.
-
-- **Campus Administrator:**
-  - Onboard and verify campus vendor stalls.
-  - Manage user role permissions, handle disputes, monitor hygiene/service compliance, and analyze campus-wide operational metrics.
+Instead of waiting in line, students receive a digital pickup token and an alert when their food is prepared. For canteen staff, the application acts as an order dashboard to accept incoming orders, update item availability when stock runs out, and organize kitchen preparation smoothly.
 
 ---
 
-## 3. Nouns (Entities / Core Domain Models)
-The nouns define the core data objects, resources, and database entities of CampusEats:
+## 2. Who Uses It (System Actors)
 
-1. **User:** Represents system actors (`user_id`, `name`, `email`, `role`, `phone`, `campus_id`).
-2. **Vendor / Canteen:** An outlet operating within campus (`vendor_id`, `name`, `stall_location`, `operating_hours`, `is_open`).
-3. **MenuItem:** Individual food or beverage offering (`item_id`, `vendor_id`, `name`, `category`, `price`, `is_available`, `prep_time_estimate`).
-4. **Order:** A transactional record binding a user to specific food items (`order_id`, `user_id`, `vendor_id`, `total_amount`, `order_status`, `placed_at`, `pickup_time`).
-5. **OrderItem:** Relational line-item representing quantity and customizations within an order (`order_item_id`, `order_id`, `item_id`, `quantity`, `unit_price`, `special_instructions`).
-6. **Payment:** Financial transaction record (`payment_id`, `order_id`, `payment_gateway_ref`, `amount`, `payment_method`, `payment_status`, `timestamp`).
-7. **Notification:** Real-time event alert dispatched to user devices (`notification_id`, `user_id`, `message_text`, `notification_type`, `is_read`).
-8. **Review:** User rating and feedback on food quality/service (`review_id`, `order_id`, `user_id`, `rating_score`, `comment_text`).
+1. **Students & Faculty (Customers):**
+   - Browse canteen menus and check available items.
+   - Add items to cart, place orders, and pay digitally.
+   - Track live order status and show token at the counter to collect food.
+
+2. **Canteen Staff / Vendors:**
+   - Manage daily food menus and toggle item availability (in-stock / out-of-stock).
+   - View incoming orders, accept or reject them based on rush.
+   - Update order preparation status (*Preparing* -> *Ready for Pickup*).
+
+3. **Campus Admin:**
+   - Onboard new canteen vendors and manage stall locations.
+   - Manage user accounts and handle order/payment disputes.
 
 ---
 
-## 4. Verbs (Actions / System Contracts / Operations)
-The verbs represent functional actions, state transitions, and API contracts executed across the system:
+## 3. Nouns (System Entities & Data Objects)
+The core things (data entities) managed by CampusEats are:
 
-1. **AuthenticateUser:** Verify campus credentials and issue secure session tokens.
-2. **BrowseMenu:** Query and filter available food items by vendor, category, dietary preference, or price range.
-3. **AddToCart:** Aggregate selected `MenuItem` records with desired quantities and customization flags.
-4. **PlaceOrder:** Validate inventory, generate a new `Order` record, and set initial state to `Pending`.
-5. **ProcessPayment:** Execute transaction via digital gateway and record `Payment` confirmation.
-6. **AcceptOrder / RejectOrder:** Vendor reviews incoming order against kitchen bandwidth and accepts or cancels it.
-7. **UpdatePreparationStatus:** Advance order lifecycle (`Pending` -> `Preparing` -> `Ready for Pickup` -> `Completed`).
-8. **NotifyCustomer:** Push live status notifications to the customer when the kitchen marks food ready for collection.
-9. **CollectOrder:** Verify order token/OTP at the vendor counter and mark order as `Completed`.
-10. **CancelOrder:** Abort an active order prior to kitchen preparation and trigger automated payment refund.
+- **User:** Stores profile information of students, faculty, and vendors (`user_id`, `name`, `email`, `role`, `phone`).
+- **Canteen:** Represents a food outlet on campus (`canteen_id`, `name`, `location`, `opening_hours`, `is_active`).
+- **MenuItem:** Represents a food dish or beverage (`item_id`, `canteen_id`, `name`, `price`, `category`, `is_available`).
+- **Order:** Represents a food order placed by a user (`order_id`, `user_id`, `canteen_id`, `total_amount`, `order_status`, `pickup_token`, `created_at`).
+- **OrderItem:** Line items inside an order with quantity and item snapshot (`order_item_id`, `order_id`, `item_id`, `quantity`, `price_at_order`).
+- **Payment:** Financial record of the transaction (`payment_id`, `order_id`, `amount`, `payment_method`, `payment_status`, `txn_reference`).
+- **Notification:** Status alert sent to the user (`notification_id`, `user_id`, `message`, `sent_at`).
+
+---
+
+## 4. Verbs (Actions & System Operations)
+The primary operations and actions executed across the system are:
+
+- **BrowseMenu:** User fetches the current list of active items for a canteen.
+- **PlaceOrder:** User validates cart items and creates a new order in `Pending` state.
+- **ProcessPayment:** User pays for the order via online payment methods.
+- **AcceptOrder:** Canteen staff reviews the incoming order and confirms preparation.
+- **UpdateOrderStatus:** Canteen staff advances the state (`Pending` -> `Preparing` -> `Ready` -> `Completed`).
+- **CollectOrder:** User verifies their pickup token at the counter and receives the meal.
+- **CancelOrder:** User or vendor cancels an order before cooking starts and initiates a refund.
+- **UpdateItemStock:** Vendor marks an item as available or out-of-stock in real time.
