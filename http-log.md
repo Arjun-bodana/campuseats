@@ -1,22 +1,36 @@
-# HTTP Request & Response Log (Task 1)
+# HTTP Logs (Task 1)
 
-This document contains 5 manual HTTP requests made using `curl -i` to a public JSON API (JSONPlaceholder), capturing request headers, response headers, status codes, and response bodies, along with deliberate 404 error testing.
-
----
-
-## Request 1: Fetch a Single Post Resource
+### Request 1: Fetching Post #1
 **Command:**
-```bash
-curl -i [https://jsonplaceholder.typicode.com/posts/1](https://jsonplaceholder.typicode.com/posts/1)
+`curl -i https://jsonplaceholder.typicode.com/posts/1`
+
+**Output:**
 HTTP/2 200 
-date: Sun, 16 Aug 2026 04:35:10 GMT
 content-type: application/json; charset=utf-8
-content-length: 292
-server: cloudflare
 
 {
   "userId": 1,
   "id": 1,
-  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-  "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+  "title": "sunt aut facere...",
+  "body": "quia et suscipit..."
 }
+
+**Notes:**
+- **Status 200 OK:** Request was successful and the server returned the requested post.
+- **Content-Type `application/json`:** Tells the client that the incoming data is formatted as JSON.
+
+---
+
+### Request 5: Deliberate 404 Test (Invalid URL)
+**Command:**
+`curl -i https://jsonplaceholder.typicode.com/invalid-post-xyz`
+
+**Output:**
+HTTP/2 404 
+content-type: application/json; charset=utf-8
+
+{}
+
+**Notes:**
+- **Status 404 Not Found:** The requested resource does not exist on the server.
+- **Content-Type `application/json`:** Even for the error response, the API sends an empty JSON object.
