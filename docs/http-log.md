@@ -107,9 +107,9 @@ content-type: application/json; charset=utf-8
 
 ---
 
-### Request 5: Deliberate 404 Test (Non-Existent User 9999)
+### Request 5: Deliberate 404 Test (Non-Existent User 99)
 **Command:**
-`curl -i https://jsonplaceholder.typicode.com/users/9999`
+`curl -i https://jsonplaceholder.typicode.com/users/99`
 
 **Output:**
 HTTP/2 404 
@@ -118,5 +118,5 @@ content-type: application/json; charset=utf-8
 {}
 
 **Notes:**
-- **Status 404 Not Found:** Client error indicating that user ID 9999 does not exist in the server database.
+- **Status 404 Not Found:** Client error indicating that user ID 99 does not exist in the server database.
 - **Content-Type `application/json`:** The API adheres to JSON format standards even when returning an empty error payload.
