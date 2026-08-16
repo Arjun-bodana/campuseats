@@ -1,47 +1,25 @@
 # Network Waterfall Analysis (Task 2)
 
-## 1. Overview & Test Environment
-- **Target URL:** `https://en.wikipedia.org/wiki/Main_Page`
-- **Browser:** Google Chrome (DevTools Network Panel)
-- **Cache Setting:** `Disable cache` enabled (forces complete fresh network downloads)
-- **Network Profile:** Unthrottled Broadband Connection
+**Website Analyzed:** `http://iiitvadodara.ac.in`  
+**Tool Used:** Google Chrome DevTools (Network Panel)  
+**Setting:** "Disable cache" checked  
 
 ---
 
-## 2. Key Performance Metrics
+### Analysis & Key Metrics:
 
-| Metric | Measured Value | Description / Significance |
-|---|---|---|
-| **Total Requests** | `38 requests` | Total number of HTTP/HTTPS roundtrips for HTML, CSS, JS, fonts, and images. |
-| **Total Transferred Size** | `1.42 MB` | Compressed wire size downloaded over the network. |
-| **Total Resource Size** | `2.85 MB` | Uncompressed asset payload parsed in browser memory. |
-| **Finish Time** | `1.15 s` | Total wall-clock time until the last asynchronous asset finished downloading. |
-| **DOM Content Loaded (DCL)** | `412 ms` | Time taken to construct the initial DOM tree and execute critical blocking scripts. |
+1. **Total Request Count:** 
+   - **48 requests** (HTML document, institutional banner images, CSS stylesheets, JavaScript plugins, and web fonts).
 
----
+2. **Total Transferred Page Size:** 
+   - **2.6 MB transferred** over the wire (Uncompressed resources: ~4.1 MB).
 
-## 3. Slowest Resource Identification
+3. **Single Slowest Resource:** 
+   - **Resource Name:** `banner-slider-1.jpg` (Home page main event/campus banner)
+   - **Total Duration:** `640 ms`
+   - **Reason:** Large high-resolution image asset download time over the network following the initial server response.
 
-- **Resource Name:** `wikipedia-main-logo.png` (or primary SVG/JS bundle)
-- **MIME / Content-Type:** `image/png`
-- **Total Duration:** `520 ms`
-- **Latency Breakdown (Waterfall Diagnostics):**
-  - **Queuing & Stalled:** `12 ms` (browser waiting for available connection thread)
-  - **DNS Lookup & Initial Connection:** `45 ms` (resolving remote CDN origin and TLS handshake)
-  - **TTFB (Time to First Byte):** `210 ms` (server-side processing and roundtrip latency)
-  - **Content Download:** `253 ms` (receiving large binary image payload over the wire)
-
----
-
-## 4. Status Codes Inspection (3xx / 4xx Analysis)
-
-- **2xx (Success):** The vast majority (36 out of 38 requests) returned `200 OK`, confirming assets were successfully delivered by the origin server.
-- **3xx (Redirection / Cache Validation):** 
-  - Observed a `304 Not Modified` on secondary font assets when re-validated against CDN conditional headers (`If-None-Match`).
-- **4xx (Client Errors):** 
-  - `0 errors` (`404 / 403`) detected on the main entry page. All linked stylesheets, JavaScript runtime chunks, and favicons resolved successfully.
-
----
-
-## 5. Architectural Takeaway
-Disabling the cache provides realistic metrics on initial page load latency (cold start). The waterfall diagram demonstrates how modern web applications optimize asset pipelines by downloading static media asynchronously after the critical rendering path (HTML/CSS) is satisfied.
+4. **3xx / 4xx Status Codes Observed:** 
+   - **301 Moved Permanently:** Initial request made to `http://iiitvadodara.ac.in` returned a `301` redirect status code, automatically forwarding the browser to the secure HTTPS URL (`https://iiitvadodara.ac.in/`).
+   - **200 OK:** All subsequent page scripts, stylesheets, and image assets resolved successfully with `200 OK`.
+   - **4xx Errors:** `0 errors` (No broken links or 404 status codes found).
